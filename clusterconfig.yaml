@@ -1,0 +1,44 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: eks-mumbai-1
+  region: ap-south-1
+
+vpc:
+  id: vpc-<vpc>
+  subnets:
+    private:
+      ap-south-1a: { id: subnet-<subnet1> }
+      ap-south-1b: { id: subnet-<subnet2> }
+iam:
+  serviceRoleARN: EKSClusterRole
+
+privateCluster:
+  enabled: true
+  skipEndpointCreation: true
+iamIdentityMappings:
+  - arn: BuildRole
+    groups:
+      - system:masters
+    username: admin
+    noDuplicateARNs: true
+nodeGroups:
+  - name: ng-1
+    instanceType: m5.large
+    minSize: 2
+    maxSize: 5
+    desiredCapacity: 2
+    iam:
+      instanceRoleARN: NodeRole
+    privateNetworking: true
+
+addons:
+  - name: vpc-cni
+    version: latest
+  - name: coredns
+    version: latest
+  - name: kube-proxy
+    version: latest
+  - name: aws-ebs-csi-driver
+    version: latest
